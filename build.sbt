@@ -4,24 +4,47 @@ val tapirVersion          = "1.12.3"
 val jsoniterMacrosVersion = "2.30.1"
 val magnumVersion         = "1.3.1"
 val hikariCPVersion       = "6.3.0"
+val log4catsVersion       = "2.7.1"
+val logbackVersion        = "1.5.18"
+
+
+lazy val commonSettings = Seq(
+  version      := "0.1.0-SNAPSHOT",
+  scalaVersion := scala3Version
+)
+
 
 lazy val root = project
   .in(file("."))
+  .settings(commonSettings)
+  .dependsOn(webdef)
   .settings(
-    name := "narrative-analytics",
-    version := "0.1.0-SNAPSHOT",
-
-    scalaVersion := scala3Version,
-
+    name                                   := "narrative-analytics",
     libraryDependencies ++= Seq(
       "com.softwaremill.sttp.tapir"           %% "tapir-core"              % tapirVersion,
       "com.softwaremill.sttp.tapir"           %% "tapir-jsoniter-scala"    % tapirVersion,
       "com.softwaremill.sttp.tapir"           %% "tapir-cats-effect"       % tapirVersion,
       "com.softwaremill.sttp.tapir"           %% "tapir-netty-server-cats" % tapirVersion,
+      "com.softwaremill.sttp.tapir"           %% "tapir-swagger-ui-bundle" % tapirVersion,
       "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros"   % jsoniterMacrosVersion,
       "com.augustnagro"                       %% "magnum"                  % magnumVersion,
-      // Java deps
+      "org.typelevel"                         %% "log4cats-slf4j"          % log4catsVersion,
+        // Java deps
+      "ch.qos.logback"                         % "logback-classic"         % logbackVersion,
       "com.zaxxer"                             % "HikariCP"                % hikariCPVersion
     ),
-    libraryDependencies += "org.scalameta" %% "munit" % "1.0.0" % Test
+    libraryDependencies += "org.scalameta" %% "munit" % "1.0.0" % Test,
+    Compile / run / fork := true
+  )
+
+
+// Web definitions that can later be exported for clients to consume
+lazy val webdef = project
+  .in(file("webdef"))
+  .settings(commonSettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      "com.softwaremill.sttp.tapir"           %% "tapir-core"              % tapirVersion,
+      "com.softwaremill.sttp.tapir"           %% "tapir-jsoniter-scala"    % tapirVersion
+    )
   )
