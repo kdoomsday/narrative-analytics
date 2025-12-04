@@ -12,8 +12,18 @@ configured to use nonstandard port 5433 so it doesn't conflict with any
 preexisting deployments.
 
 Some application options can be configured via `application.conf`, including
-database access and server port.
+database access and server port. By default the application will start on
+`0.0.0.0:8080` so pointing any requests there should work
 
+### Exposed endpoints
+- POST /analytics?timestamp={millis_since_epoch}&user={user_id}&event={click|impression}
+- GET /analytics?timestamp={millis_since_epoch}
+- GET /analyticsJson?timestamp={millis_since_epoch}
+
+The difference between the GET endpoints is the output. `/analytics` will return
+the queried data in plain text in a requested format. `analyticsJson` will
+return the data as `application/json` with the full data, including the bounds
+of the time range.
 
 ### Structure
 
