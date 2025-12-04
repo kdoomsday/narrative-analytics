@@ -11,6 +11,10 @@ val postgresVersion       = "42.7.7"
 val pureconfigVersion     = "0.17.9"
 val scaffeineVersion      = "5.3.0"
 
+// Test deps
+val munitVersion     = "1.0.0"
+val munitCatsVersion = "2.1.0"
+val scalaMockVersion = "7.5.1"
 
 lazy val commonSettings = Seq(
   version      := "0.1.0-SNAPSHOT",
@@ -39,7 +43,12 @@ lazy val root = project
       "org.postgresql"                         % "postgresql"              % postgresVersion,
       "com.zaxxer"                             % "HikariCP"                % hikariCPVersion
     ),
-    libraryDependencies += "org.scalameta" %% "munit" % "1.0.0" % Test,
+    libraryDependencies ++= Seq(
+      "org.scalameta"               %% "munit"                   % munitVersion     % Test,
+      "org.scalamock"               %% "scalamock"               % scalaMockVersion % Test,
+      "org.typelevel"               %% "munit-cats-effect"       % munitCatsVersion % Test,
+      "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub4-server" % tapirVersion     % Test
+    ),
     Compile / run / fork := true
   )
 
