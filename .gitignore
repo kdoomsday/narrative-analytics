@@ -33,3 +33,4 @@ metals.sbt
 
 # Emacs
 .projectile
+.sbt-hydra-history
