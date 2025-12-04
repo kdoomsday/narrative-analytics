@@ -44,9 +44,10 @@ lazy val root = project
       "com.zaxxer"                             % "HikariCP"                % hikariCPVersion
     ),
     libraryDependencies ++= Seq(
-      "org.scalameta" %% "munit"             % munitVersion     % Test,
-      "org.scalamock" %% "scalamock"         % scalaMockVersion % Test,
-      "org.typelevel" %% "munit-cats-effect" % munitCatsVersion % Test
+      "org.scalameta"               %% "munit"                   % munitVersion     % Test,
+      "org.scalamock"               %% "scalamock"               % scalaMockVersion % Test,
+      "org.typelevel"               %% "munit-cats-effect"       % munitCatsVersion % Test,
+      "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub4-server" % tapirVersion     % Test
     ),
     Compile / run / fork := true
   )

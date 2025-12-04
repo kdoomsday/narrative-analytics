@@ -1,6 +1,10 @@
 package com.narrative.analytics
 
+
 import scala.util.Random
+import com.narrative.analytics.models.TimeRangeAggregation
+import com.narrative.analytics.models.TrackedEventCreator
+import com.narrative.analytics.models.Event
 
 
 /** Some helpers to generate test values */
@@ -15,6 +19,7 @@ trait Generators {
     Random.alphanumeric.take(len).mkString
   }
 
+
   def randomLong(min: Long = 0L, max: Long = Long.MaxValue): Long =
     Random.nextLong(max - min) + min
 
@@ -27,5 +32,15 @@ trait Generators {
    */
   def select[T](coll: Iterable[T]): T =
     Random.shuffle(coll).head
+
+
+  /** A random event creator with params */
+  def eventCreator(timestamp: Long = System.currentTimeMillis()): TrackedEventCreator =
+    TrackedEventCreator(timestamp, randomLong(), select(Event.values))
+
+
+  /** A `TimeRangeAggregation` with all random values */
+  inline def randomAggregation() =
+    TimeRangeAggregation(randomLong(), randomLong(), randomLong(), randomLong(), randomLong())
 
 }

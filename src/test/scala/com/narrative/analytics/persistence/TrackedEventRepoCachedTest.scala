@@ -95,13 +95,4 @@ class TrackedEventRepoCachedTest extends CatsEffectSuite, Stubs, Generators {
   ): (TrackedEventRepoCached[IO], Stub[TrackedEventRepo[IO]]) =
     testObjects(Some(expectedCreator))
 
-
-  /** A random event creator with params */
-  private def eventCreator(timestamp: Long = System.currentTimeMillis()): TrackedEventCreator =
-    TrackedEventCreator(timestamp, randomLong(), select(Event.values))
-
-
-  private inline def randomAggregation() =
-    TimeRangeAggregation(randomLong(), randomLong(), randomLong(), randomLong(), randomLong())
-
 }
