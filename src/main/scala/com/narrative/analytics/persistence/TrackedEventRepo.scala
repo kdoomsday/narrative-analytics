@@ -2,7 +2,9 @@ package com.narrative.analytics.persistence
 
 
 import com.narrative.analytics.models.TrackedEventCreator
-import com.narrative.analytics.models.TimerangeAggregation
+import com.narrative.analytics.models.TimeRange
+import com.narrative.analytics.models.TimeRangeAggregation
+import com.narrative.analytics.models.TrackedEvent
 
 
 /**
@@ -16,13 +18,12 @@ trait TrackedEventRepo[F[_]] {
    * @param event [[TrackedEventCreator]] with the event's info
    * @return Created [[TrackedEvent]]
    */
-  def storeEvent(event: TrackedEventCreator): F[Unit]
+  def storeEvent(event: TrackedEventCreator): F[TrackedEvent]
 
   /**
    * Get a [[TimerangeAggregation]] from underlying data
-   * @param startEpoch Timestamp in millis from Epoch for the start of considered data (inclusive)
-   * @param endEpoch Timestamp in millis from Epoch for the end of considered data (exclusive)
+   * @param range [[TimeRange]] for which we query
    * @return [[TimerangeAggregation]] with the result
    */
-  def aggregateEvents(startEpoch: Long, endEpoch: Long): F[TimerangeAggregation]
+  def aggregateEvents(range: TimeRange): F[TimeRangeAggregation]
 }

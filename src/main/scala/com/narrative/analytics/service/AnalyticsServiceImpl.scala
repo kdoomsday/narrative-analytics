@@ -4,9 +4,11 @@ package com.narrative.analytics.service
 import cats.effect.Sync
 import cats.syntax.all.*
 import com.narrative.analytics.models.Event
-import com.narrative.analytics.models.TimerangeAggregation
+import com.narrative.analytics.models.TimeRange
+import com.narrative.analytics.models.TimeRangeAggregation
 import com.narrative.analytics.models.TrackedEventCreator
 import com.narrative.analytics.persistence.TrackedEventRepo
+import com.narrative.analytics.time.TimeRangeFinder
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 import org.typelevel.log4cats.syntax.*
@@ -18,8 +20,10 @@ import org.typelevel.log4cats.syntax.*
  *
  * @param trackedEventRepo [[TrackedEventRepo]]
  */
-class AnalyticsServiceImpl[F[_]: Sync](trackedEventRepo: TrackedEventRepo[F])
-    extends AnalyticsService[F] {
+class AnalyticsServiceImpl[F[_]: Sync](
+    trackedEventRepo: TrackedEventRepo[F],
+    timeRangeFinder: TimeRangeFinder
+) extends AnalyticsService[F] {
 
   implicit def logger: Logger[F] = Slf4jLogger.getLogger[F]
 
@@ -31,21 +35,21 @@ class AnalyticsServiceImpl[F[_]: Sync](trackedEventRepo: TrackedEventRepo[F])
     } yield ()
 
 
-  override def aggregateRange(timestamp: Long): F[TimerangeAggregation] =
+  override def aggregateRange(timestamp: Long): F[TimeRangeAggregation] =
     for {
-      (startTime, endTime) <- rangeForTimestamp(timestamp)
-      aggregation          <- trackedEventRepo.aggregateEvents(startTime, endTime)
+      range       <- rangeForTimestamp(timestamp)
+      _           <- info"Aggregate range $range"
+      aggregation <- trackedEventRepo.aggregateEvents(range)
     } yield aggregation
 
 
   /**
-    * Start and end times, given a timestamp
-    *
-    * @param timestamp
-    * @return
-    */
-  private def rangeForTimestamp(timestamp: Long): F[(startTime: Long, endTime: Long)] =
-    // TODO for testing
-    Sync[F].pure((timestamp - 3L, timestamp + 3L))
+   * Start and end times, given a timestamp
+   *
+   * @param timestamp
+   * @return
+   */
+  private inline def rangeForTimestamp(timestamp: Long): F[TimeRange] =
+    Sync[F].pure(timeRangeFinder.timeRangeFor(timestamp))
 
 }

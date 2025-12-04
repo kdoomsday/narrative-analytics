@@ -16,7 +16,7 @@ import sttp.tapir.Schema
  * @param clicks Number of clicks
  * @param impressions Number of impressions
  */
-case class TimerangeAggregation(
+case class TimeRangeAggregation(
   timeStart: Long,
   timeEnd: Long,
   uniqueUsers: Long,

@@ -2,7 +2,7 @@ package com.narrative.analytics
 
 
 import com.narrative.analytics.models.Event
-import com.narrative.analytics.models.TimerangeAggregation
+import com.narrative.analytics.models.TimeRangeAggregation
 import com.narrative.analytics.models.Event.given
 import sttp.model.StatusCode
 import sttp.tapir.*
@@ -33,6 +33,6 @@ object Endpoints {
     .get
     .in("analyticsJson")
     .in(query[Long]("timestamp"))
-    .out(jsonBody[TimerangeAggregation])
+    .out(jsonBody[TimeRangeAggregation])
 
 }

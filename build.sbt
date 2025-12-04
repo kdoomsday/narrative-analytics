@@ -9,6 +9,7 @@ val logbackVersion        = "1.5.18"
 val macwireVersion        = "2.6.6"
 val postgresVersion       = "42.7.7"
 val pureconfigVersion     = "0.17.9"
+val scaffeineVersion      = "5.3.0"
 
 
 lazy val commonSettings = Seq(
@@ -24,8 +25,6 @@ lazy val root = project
   .settings(
     name := "narrative-analytics",
     libraryDependencies ++= Seq(
-      "com.softwaremill.sttp.tapir"           %% "tapir-core"              % tapirVersion,
-      "com.softwaremill.sttp.tapir"           %% "tapir-jsoniter-scala"    % tapirVersion,
       "com.softwaremill.sttp.tapir"           %% "tapir-cats-effect"       % tapirVersion,
       "com.softwaremill.sttp.tapir"           %% "tapir-netty-server-cats" % tapirVersion,
       "com.softwaremill.sttp.tapir"           %% "tapir-swagger-ui-bundle" % tapirVersion,
@@ -33,6 +32,7 @@ lazy val root = project
       "org.typelevel"                         %% "log4cats-slf4j"          % log4catsVersion,
       "com.softwaremill.macwire"              %% "macros"                  % macwireVersion,
       "com.github.pureconfig"                 %% "pureconfig-core"         % pureconfigVersion,
+      "com.github.blemale"                    %% "scaffeine"               % scaffeineVersion,
       // Java deps
       "ch.qos.logback"                         % "logback-classic"         % logbackVersion,
       // Database

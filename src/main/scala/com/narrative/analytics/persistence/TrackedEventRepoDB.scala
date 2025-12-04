@@ -4,7 +4,8 @@ package com.narrative.analytics.persistence
 import cats.effect.Async
 import com.augustnagro.magnum.*
 import com.narrative.analytics.models.Event
-import com.narrative.analytics.models.TimerangeAggregation
+import com.narrative.analytics.models.TimeRange
+import com.narrative.analytics.models.TimeRangeAggregation
 import com.narrative.analytics.models.TrackedEvent
 import com.narrative.analytics.models.TrackedEventCreator
 
@@ -21,21 +22,21 @@ class TrackedEventRepoDB[F[_]: Async](dataSource: DataSource) extends TrackedEve
   private val underlyingRepo = Repo[TrackedEventCreator, TrackedEvent, Long]
 
 
-  override def storeEvent(event: TrackedEventCreator): F[Unit] = Async[F].blocking {
+  override def storeEvent(event: TrackedEventCreator): F[TrackedEvent] = Async[F].blocking {
     transact(dataSource) {
-      underlyingRepo.insert(event)
+      underlyingRepo.insertReturning(event)
     }
   }
 
 
-  override def aggregateEvents(startEpoch: Long, endEpoch: Long): F[TimerangeAggregation] =
+  override def aggregateEvents(range: TimeRange): F[TimeRangeAggregation] =
     Async[F].blocking {
       transact(dataSource) {
-        val uniqueUsers = distinctUsers(startEpoch, endEpoch)
-        val eventMap    = groupedEvents(startEpoch, endEpoch).withDefaultValue(0L)
-        TimerangeAggregation(
-          startEpoch,
-          endEpoch,
+        val uniqueUsers = distinctUsers(range.startEpoch, range.endEpoch)
+        val eventMap    = groupedEvents(range.startEpoch, range.endEpoch).withDefaultValue(0L)
+        TimeRangeAggregation(
+          range.startEpoch,
+          range.endEpoch,
           uniqueUsers,
           eventMap(Event.Click),
           eventMap(Event.Impression)
@@ -74,7 +75,7 @@ class TrackedEventRepoDB[F[_]: Async](dataSource: DataSource) extends TrackedEve
   private def groupedEvents(startEpoch: Long, endEpoch: Long)(using tx: DbTx): Map[Event, Long] =
     sql"""select event, count(*) as c
             from tracked_event
-            where timestamp >= 1764854021 and timestamp < 1764854027
+            where timestamp >= $startEpoch and timestamp < $endEpoch
             group by event"""
       .query[(String, Long)]
       .run()

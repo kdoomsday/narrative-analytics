@@ -7,11 +7,14 @@ import com.narrative.analytics.persistence.TrackedEventRepo
 import com.narrative.analytics.persistence.TrackedEventRepoDB
 import com.narrative.analytics.service.AnalyticsService
 import com.narrative.analytics.service.AnalyticsServiceImpl
+import com.narrative.analytics.time.TimeRangeFinder
+import com.narrative.analytics.time.TimeRangeFinderHour
 import com.narrative.analytics.web.EndpointsImpl
 import com.zaxxer.hikari.HikariDataSource
 import pureconfig.ConfigSource
 
 import javax.sql.DataSource
+import com.narrative.analytics.persistence.TrackedEventRepoCached
 
 
 trait WebModule {
@@ -33,7 +36,11 @@ trait WebModule {
   }
 
 
-  lazy val trackedEventRepo: TrackedEventRepo[IO] = wireRec[TrackedEventRepoDB[IO]]
+  lazy val timeRangeFinder: TimeRangeFinder       = wireRec[TimeRangeFinderHour]
+
+  // Need to use a specific instance here so the correct underlying implementation is used
+  lazy val trackedEventRepo: TrackedEventRepo[IO] = new TrackedEventRepoCached[IO](wireRec[TrackedEventRepoDB[IO]], timeRangeFinder)
+
   lazy val analyticsService: AnalyticsService[IO] = wireRec[AnalyticsServiceImpl[IO]]
   lazy val endpoints: EndpointsImpl[IO]           = wireRec[EndpointsImpl[IO]]
 }

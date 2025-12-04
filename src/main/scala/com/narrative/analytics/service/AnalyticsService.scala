@@ -2,7 +2,7 @@ package com.narrative.analytics.service
 
 
 import com.narrative.analytics.models.Event
-import com.narrative.analytics.models.TimerangeAggregation
+import com.narrative.analytics.models.TimeRangeAggregation
 import com.narrative.analytics.models.TrackedEventCreator
 
 
@@ -27,5 +27,5 @@ trait AnalyticsService[F[_]] {
    * @param timestamp Timestamp that is being queried
    * @return [[TimerangeAggregation]] for that timestamp
    */
-  def aggregateRange(timestamp: Long): F[TimerangeAggregation]
+  def aggregateRange(timestamp: Long): F[TimeRangeAggregation]
 }
