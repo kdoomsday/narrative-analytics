@@ -3,6 +3,8 @@ package com.narrative.analytics
 
 import cats.effect.IO
 import com.narrative.analytics.config.AppConfig
+import com.narrative.analytics.format.AggregationFormatter
+import com.narrative.analytics.format.AggregationFormatterDefault
 import com.narrative.analytics.persistence.TrackedEventRepo
 import com.narrative.analytics.persistence.TrackedEventRepoDB
 import com.narrative.analytics.service.AnalyticsService
@@ -36,7 +38,8 @@ trait WebModule {
   }
 
 
-  lazy val timeRangeFinder: TimeRangeFinder       = wireRec[TimeRangeFinderHour]
+  lazy val timeRangeFinder: TimeRangeFinder           = wireRec[TimeRangeFinderHour]
+  lazy val aggregationFormatter: AggregationFormatter = wireRec[AggregationFormatterDefault]
 
   // Need to use a specific instance here so the correct underlying implementation is used
   lazy val trackedEventRepo: TrackedEventRepo[IO] = new TrackedEventRepoCached[IO](wireRec[TrackedEventRepoDB[IO]], timeRangeFinder)

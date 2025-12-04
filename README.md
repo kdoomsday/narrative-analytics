@@ -31,4 +31,6 @@ The rest of the main application is in the root project. In particular, the foll
     - `TrackedEventRepoDB`: Implements the repo comunicating with the database
     - `TrackedEventRepoCached`: Cache in front of db access to prevent excessive querying
 - `TimeRangeFinder`: Takes a timestamp and provides the corresponding `TimeRange`
-  - `TimeRangeFinderHour`: Implementation that finds the surrounding hour block and uses that as the range
+    - `TimeRangeFinderHour`: Implementation that finds the surrounding hour block and uses that as the range
+- `AggregationFormatter`: Contract for formatting output for the GET endpoint
+    - `AggregationFormatterDefault`: Implementation of formatting as required

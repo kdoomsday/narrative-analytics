@@ -4,6 +4,7 @@ package com.narrative.analytics.web
 import cats.effect.Sync
 import cats.syntax.all.*
 import com.narrative.analytics.Endpoints
+import com.narrative.analytics.format.AggregationFormatter
 import com.narrative.analytics.service.AnalyticsService
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
@@ -11,7 +12,10 @@ import org.typelevel.log4cats.syntax.*
 
 
 /** Implements server logic for endpoints */
-class EndpointsImpl[F[_]: Sync](analyticsService: AnalyticsService[F]) {
+class EndpointsImpl[F[_]: Sync](
+    analyticsService: AnalyticsService[F],
+    aggregationFormatter: AggregationFormatter
+) {
   implicit def logger: Logger[F] = Slf4jLogger.getLogger[F]
 
   // All endpoints exposed here
@@ -29,7 +33,7 @@ class EndpointsImpl[F[_]: Sync](analyticsService: AnalyticsService[F]) {
     debug"Get analytics for $timestamp" >>
       analyticsService
         .aggregateRange(timestamp)
-        .map(agg => Right(agg.toString()))
+        .map(agg => Right(aggregationFormatter.format(agg)))
   }
 
 
