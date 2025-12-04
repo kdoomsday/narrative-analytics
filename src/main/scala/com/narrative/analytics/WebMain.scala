@@ -10,20 +10,21 @@ import cats.effect.IO
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 import org.typelevel.log4cats.syntax.*
+import com.narrative.analytics.web.EndpointsImpl
 
 
 object WebMain extends ResourceApp.Forever {
   implicit def logger: Logger[IO] = Slf4jLogger.getLogger[IO]
 
-  private val host = "0.0.0.0"
-  private val port = 8080
+  private val module = new WebModule {}
 
-  private val endpoints = new EndpointsImpl[IO]()
+  private val host = module.appConfig.webConfig.host
+  private val port = module.appConfig.webConfig.port
 
 
   private val docEndpoints =
     SwaggerInterpreter().fromServerEndpoints(
-      endpoints.all,
+      module.endpoints.all,
       "Narrative Analytics",
       "1.0"
     )
@@ -35,7 +36,7 @@ object WebMain extends ResourceApp.Forever {
         server
           .port(port)
           .host(host)
-          .addEndpoints(endpoints.all)
+          .addEndpoints(module.endpoints.all)
           .addEndpoints(docEndpoints)
           .start()
       )(_.stop())
