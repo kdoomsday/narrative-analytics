@@ -13,7 +13,20 @@ preexisting deployments.
 
 Some application options can be configured via `application.conf`, including
 database access and server port. By default the application will start on
-`0.0.0.0:8080` so pointing any requests there should work
+`0.0.0.0:8080` so pointing any requests there (or localhost) should work.
+
+#### Client
+The `client` module can be run in order to insert random sample data. This can
+be done with `sbt "client/run"`.
+
+You can configure the client via its `application.conf` file. The main configurations are:
+- **root-host**: Root for calls. Usually `http://localhost:8080`
+- **data-points**: Number of data points to be created. Application will make a call per datapoint
+- **max-user-id**: User ids will be all positive and below this number. Mostly for sanity.
+
+The client will generate a random timestamp after the epoch and before the
+current time. It will generate a user from 0 to `abs(max-user-id)` to keep it
+positive. It will select randomly between `click` and `impression`.
 
 ### Exposed endpoints
 - POST /analytics?timestamp={millis_since_epoch}&user={user_id}&event={click|impression}
@@ -44,3 +57,6 @@ The rest of the main application is in the root project. In particular, the foll
     - `TimeRangeFinderHour`: Implementation that finds the surrounding hour block and uses that as the range
 - `AggregationFormatter`: Contract for formatting output for the GET endpoint
     - `AggregationFormatterDefault`: Implementation of formatting as required
+
+
+Additionally, there is a `client` module to assist with inserting data points.

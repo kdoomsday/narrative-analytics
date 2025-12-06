@@ -64,3 +64,15 @@ lazy val webdef = project
       "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros"   % jsoniterMacrosVersion
     )
   )
+
+// Client calls
+lazy val client = project
+  .in(file("client"))
+  .dependsOn(webdef)
+  .settings(commonSettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      "com.softwaremill.sttp.tapir" %% "tapir-sttp-client4" % tapirVersion,
+      "com.github.pureconfig"       %% "pureconfig-core"    % pureconfigVersion,
+    )
+  )
