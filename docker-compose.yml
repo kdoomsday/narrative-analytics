@@ -13,3 +13,29 @@ services:
       POSTGRES_PASSWORD: example
     volumes:
       - ./scripts/:/docker-entrypoint-initdb.d
+
+  prometheus:
+      image: prom/prometheus
+      container_name: prometheus
+      command:
+        - '--config.file=/etc/prometheus/prometheus.yml'
+      restart: unless-stopped
+      volumes:
+        - ./docker/prometheus:/etc/prometheus
+        - prom_data:/prometheus
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=grafana
+    volumes:
+      - ./docker/grafana:/etc/grafana/provisioning/datasources
+
+volumes:
+  prom_data:
+
