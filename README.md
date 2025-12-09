@@ -6,16 +6,44 @@ This is a normal sbt project. You can compile code with `sbt compile`, run it
 with `sbt run`, and `sbt console` will start a Scala 3 REPL.
 
 The server requires a PostgresQL database with the correct structure. You can
-start an empty database with `docker compose up -d` which will use the provided
-`docker-compose.yml` file and scripts to make the system ready. This has been
-configured to use nonstandard port 5433 so it doesn't conflict with any
+start an empty database with `docker compose up db -d` which will use the
+provided `docker-compose.yml` file and scripts to make the system ready. This
+has been configured to use nonstandard port 5433 so it doesn't conflict with any
 preexisting deployments.
 
 Some application options can be configured via `application.conf`, including
 database access and server port. By default the application will start on
 `0.0.0.0:8080` so pointing any requests there (or localhost) should work.
 
-#### Client
+
+#### Configuration options
+The application allows configuration via `application.conf` or via environment
+variables. You can look into the file for options or configure the following:
+  - `DB_URL`: JDBC url for the PostgresQL database to connect to
+  - `DB_USER`: DB user for authentication
+  - `DB_PASSWORD`: DB password
+  - `WEB_URL`: Root url to use. Probably best left at the default.
+  - `WEB_PORT`: Listen port for the server
+
+
+#### Creating a docker image
+You can run `sbt "Docker/publishLocal"` to create a Docker image in your local
+registry. The image will be called **narrative-analytics**
+
+
+#### Running via docker compose
+If you already have the image created in your local registry, you can run
+`docker compose up -d` to start all services. The following will be started:
+  - PostgresQL database ready with the initial scripts
+  - Prometheus container that scrapes the local application for metrics
+  - Grafana instance pre-configured with the Prometheus data source
+  - The actual application listening on port 8080
+
+All services will be connected and you can look at metrics by logging into
+`localhost:3000` for the grafana instance. No dashboards have been
+pre-configured, however.
+
+### Client
 The `client` module can be run in order to insert random sample data. This can
 be done with `sbt "client/run"`.
 
@@ -36,6 +64,7 @@ current time. It will generate a user from 0 to `abs(max-user-id)` to keep it
 non-negative. It will select randomly and roughly equally between `click` and
 `impression`.
 
+
 ### Exposed endpoints
   - POST /analytics?timestamp={millis_since_epoch}&user={user_id}&event={click|impression}
   - GET /analytics?timestamp={millis_since_epoch}
@@ -45,6 +74,7 @@ The difference between the GET endpoints is the output. `/analytics` will return
 the queried data in plain text in a requested format. `analyticsJson` will
 return the data as `application/json` with the full data, including the bounds
 of the time range.
+
 
 ### Structure
 
