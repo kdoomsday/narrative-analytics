@@ -13,6 +13,7 @@ val macwireVersion        = "2.6.6"
 val postgresVersion       = "42.7.7"
 val pureconfigVersion     = "0.17.9"
 val scaffeineVersion      = "5.3.0"
+val catsVersion           = "3.6.3"
 
 // Test deps
 val munitVersion     = "1.0.0"
@@ -94,5 +95,7 @@ lazy val client = project
     libraryDependencies ++= Seq(
       "com.softwaremill.sttp.tapir" %% "tapir-sttp-client4" % tapirVersion,
       "com.github.pureconfig"       %% "pureconfig-core"    % pureconfigVersion,
-    )
+      "org.typelevel"               %% "cats-effect"        % catsVersion
+    ),
+    Compile / run / fork := true
   )
