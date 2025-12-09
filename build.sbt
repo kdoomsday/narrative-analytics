@@ -1,3 +1,6 @@
+enablePlugins(DockerPlugin)
+enablePlugins(JavaAppPackaging)
+
 val scala3Version = "3.7.4"
 
 val tapirVersion          = "1.12.3"
@@ -62,7 +65,11 @@ lazy val root = project
       "org.typelevel"               %% "munit-cats-effect"        % munitCatsVersion % Test,
       "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub4-server"  % tapirVersion     % Test
     ),
-    Compile / run / fork := true
+    Compile / run / fork := true,
+
+    dockerExposedPorts ++= Seq(8080),
+    Docker / maintainer := "kdoomsday",
+    dockerBaseImage := "eclipse-temurin:21"
   )
 
 
