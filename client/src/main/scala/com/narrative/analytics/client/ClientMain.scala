@@ -11,15 +11,18 @@ import sttp.tapir.DecodeResult.Value
 import sttp.tapir.client.sttp4.SttpClientInterpreter
 
 import scala.util.Random
+import cats.effect.IO
+import cats.effect.IOApp
 
 
-object ClientMain {
+object ClientMain extends IOApp.Simple {
 
-  def main(args: Array[String]): Unit = {
+  override def run: IO[Unit] = {
     given conf: ClientConfig = ConfigSource.default.loadOrThrow
-
-    val (successes, failures) = callAndAggregate()
-    println(s"Successes = $successes, Failures = $failures")
+    for {
+      (successes, failures) <- parCall()
+      _                     <- IO.println(s"Successes = $successes, Failures = $failures")
+    } yield ()
   }
 
 
@@ -64,11 +67,21 @@ object ClientMain {
   }
 
 
-  /** Call as many times as required, and return number of successes and failures */
-  private def callAndAggregate()(using conf: ClientConfig): (successes: Int, failures: Int) =
-    (1 to conf.dataPoints).foldLeft((successes = 0, failures = 0)) { case (m, i) =>
-      if (randomCall()) (m.successes + 1, m.failures)
-      else (m.successes, m.failures)
+  /**
+   * Make `randomCall()`s to the server in parallel.
+   * Configuration controls how many calls can be made in parallel. The *total*
+   * number of calls is the number of data points desired
+   *
+   * @param conf `ClientConfig` to use for parameters
+   * @return `IO[(Int, Int)]` with number of successes and failures
+   */
+  private def parCall()(using conf: ClientConfig): IO[(successes: Int, failures: Int)] =
+    IO.parTraverseN(conf.maxParCalls)((1 to conf.dataPoints).toList) { _ =>
+      IO.blocking(randomCall())
+        .map(if _ then 1 else 0)
+    }.map { l =>
+        val successes = l.sum
+        (successes, conf.dataPoints - successes)
     }
 
 

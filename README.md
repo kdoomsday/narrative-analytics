@@ -20,18 +20,26 @@ The `client` module can be run in order to insert random sample data. This can
 be done with `sbt "client/run"`.
 
 You can configure the client via its `application.conf` file. The main configurations are:
-- **root-host**: Root for calls. Usually `http://localhost:8080`
-- **data-points**: Number of data points to be created. Application will make a call per datapoint
-- **max-user-id**: User ids will be all positive and below this number. Mostly for sanity.
+  - **root-host**: Root for calls. This is where the server is expected to be. By default `http://localhost:8080`
+  - **data-points**: Number of data points to be created. Application will make a call per datapoint
+  - **max-user-id**: User ids will be all positive and below this number. Mostly for sanity.
+  - **max-par-calls**: Maximum number of calls to make to the server in parallel
+
+The client also allows overriding the configs via the following environment variables:
+  - `ROOT_HOST`: Overrides **root-host**
+  - `DATA_POINTS`: Overrides **data-points**
+  - `MAX_USER_ID`: Overrides **max-user-id**
+  - `MAX_PAR_CALLS`: Overrides **max-par-calls**
 
 The client will generate a random timestamp after the epoch and before the
 current time. It will generate a user from 0 to `abs(max-user-id)` to keep it
-positive. It will select randomly between `click` and `impression`.
+non-negative. It will select randomly and roughly equally between `click` and
+`impression`.
 
 ### Exposed endpoints
-- POST /analytics?timestamp={millis_since_epoch}&user={user_id}&event={click|impression}
-- GET /analytics?timestamp={millis_since_epoch}
-- GET /analyticsJson?timestamp={millis_since_epoch}
+  - POST /analytics?timestamp={millis_since_epoch}&user={user_id}&event={click|impression}
+  - GET /analytics?timestamp={millis_since_epoch}
+  - GET /analyticsJson?timestamp={millis_since_epoch}
 
 The difference between the GET endpoints is the output. `/analytics` will return
 the queried data in plain text in a requested format. `analyticsJson` will
